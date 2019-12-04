@@ -14,12 +14,13 @@
 #   Test Package:              'Ctrl + Shift + T'
 
 hello <- function(){
-  print("hello world")
+  print("Hello Melda")
 }
 
-#finding dependencies of package?
 melda.findDependency <- function(x){
+
   tools::package_dependencies(x)
+
 }
 
 
@@ -40,14 +41,20 @@ melda.read_object <- function(meldaJson){
   print("Json file is read")
   tryCatch({
 
-    for(i in 1:length(json$project$stages)){ #looping for stages
+    for(i in 1:length(json$project$stages)){ #looping for stages // i is the stage number
+      print( paste( "Stage number is:", i))
 
-      for(j in 1:length(json$project$stages[[i]][[8]])){ # for each R code cell in ith stage
+      for(j in 1:length(json$project$stages[[i]][[8]])){ # for each R code cell in ith stage // j is the cell number
+        print( paste( "Stage number is:", i, "cell number is ", j))
 
         if(json$project$stages[[i]][[8]][[j]]$language == "R"){
 
+          indexNum <- json$project$stages[[i]][[8]][[j]]$index + 1 # handling index  0  error
 
-          temp[[i]] <- paste(temp[[i]], json$project$stages[[i]][[8]][[j]]$code, sep = "\n")
+          temp[[i]][[indexNum]] <-  json$project$stages[[i]][[8]][[j]]$code
+
+
+          temp[[i]][[indexNum]] <- as.list(temp[[i]][[indexNum]])
           print( paste( "Stage number is:", i, "cell number is ", j))
 
         }
@@ -56,7 +63,7 @@ melda.read_object <- function(meldaJson){
     }
 
   },error = function(e) {
-    print(paste("Error in stage number:", i,"and cell number:" , j ))
+    print(paste("Error in stage number:", i,"and cell number:" , j,e ))
   })
 
   temp
@@ -73,7 +80,7 @@ melda.read_object <- function(meldaJson){
 #' @return loads the functions' library if it is not loaded.
 #' @export
 
-melda.findLibrary <- function(input,load = FALSE){
+melda.findLibrary <- function(input,load = FALSE, baseFunc = FALSE){
 
   if(is.character(input) ){
 
@@ -120,8 +127,6 @@ melda.findLibrary <- function(input,load = FALSE){
 }
 
 
-
-
 #' Load a Character Vector
 #'
 #This function takes function names as input.
@@ -130,10 +135,16 @@ melda.findLibrary <- function(input,load = FALSE){
 #' @return returns function names as list
 #' @export
 melda.findFunctionName <- function(x){
-  x <- all.names(parse(text = x ), unique = TRUE) # converts character vector as R expression
-  x
-}
 
+  if(is.character(x)){
+    x <- getInputs(parse(text = x))
+    x <- x@functions
+    x <- names(x)
+    x
+  }else{
+    "It's not an expression"
+  }
+}
 
 
 #' Remove duplicate words
@@ -145,8 +156,11 @@ melda.findFunctionName <- function(x){
 #' @export
 
 rem_dup.one <- function(x){
+
   paste(unique(trimws(unlist(strsplit(x,split="(?!')[ [:punct:]]",fixed=F,perl=T)))),collapse = " ")
+
 }
+
 
 
 

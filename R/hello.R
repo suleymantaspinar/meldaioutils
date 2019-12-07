@@ -43,20 +43,18 @@ melda.read_object <- function(meldaJson){
 
     for(i in 1:length(json$project$stages)){ #looping for stages // i is the stage number
       print( paste( "Stage number is:", i))
-
+      z <- 1
       for(j in 1:length(json$project$stages[[i]][[8]])){ # for each R code cell in ith stage // j is the cell number
         print( paste( "Stage number is:", i, "cell number is ", j))
 
         if(json$project$stages[[i]][[8]][[j]]$language == "R"){
 
-          indexNum <- json$project$stages[[i]][[8]][[j]]$index + 1 # handling index  0  error
-
-          temp[[i]][[indexNum]] <-  json$project$stages[[i]][[8]][[j]]$code
+          temp[[i]][[z]] <-  json$project$stages[[i]][[8]][[j]]$code
 
 
-          temp[[i]][[indexNum]] <- as.list(temp[[i]][[indexNum]])
+          temp[[i]][[z]] <- as.list(temp[[i]][[z]])
           print( paste( "Stage number is:", i, "cell number is ", j))
-
+          z <- z + 1
         }
 
       }
@@ -66,7 +64,7 @@ melda.read_object <- function(meldaJson){
     print(paste("Error in stage number:", i,"and cell number:" , j,e ))
   })
 
-  temp
+  return(temp)
 
 }
 
@@ -80,21 +78,26 @@ melda.read_object <- function(meldaJson){
 #' @return loads the functions' library if it is not loaded.
 #' @export
 
-melda.findLibrary <- function(input,load = FALSE, baseFunc = FALSE){
+melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
 
-  if(is.character(input) ){
+    tryCatch(
+      {
 
-    df <- help.search(input)
+        df <- help.search(input)
 
-    df <- df$matches
+        df <- df$matches
 
-    x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
-    if(length(x) > 1){
+        x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
+      },error = function(e){
+
+      }
+    )
+      if(length(x) > 1){
 
       if(load == TRUE){
         cat(  paste("1. is",x[[1]],"\n","2. is",x[[2]],"\n"), sep = "")
 
-        userInput <-as.numeric( readline(prompt =("Type 1 or 2:  ")))
+        userInput <- as.numeric( readline(prompt =("Type 1 or 2:  ")))
 
         print( paste( x[[userInput]],"is choosed","\n",x[[userInput]], "is attaching/loading"), sep= "")
 
@@ -102,9 +105,14 @@ melda.findLibrary <- function(input,load = FALSE, baseFunc = FALSE){
 
 
       }
+      if(dblcolon == T ){
 
-      print(x[[1]])
-
+        for(i in 1:length(x)){
+          x[[i]] <- paste(x[[i]],"::",input,sep ="")
+        }
+        return(x)
+      }
+      return(x)
     }else if(length(x) == 1){
 
       if(load  == TRUE){
@@ -113,16 +121,19 @@ melda.findLibrary <- function(input,load = FALSE, baseFunc = FALSE){
         userLibrary <- x[[1]]
 
       }
-      print(x[[1]])
+
+      if(dblcolon == T ){
+        print(paste(x,"::",input,sep =""))
+      }
+      return(x)
+    }else{
+      print("Function not found.")
+      return(NULL)
+      }
 
 
-    }
 
 
-
-  }else{
-    print("This is not character")
-  }
 
 }
 
@@ -134,16 +145,19 @@ melda.findLibrary <- function(input,load = FALSE, baseFunc = FALSE){
 #' @param x takes  character vector  as an input
 #' @return returns function names as list
 #' @export
-melda.findFunctionName <- function(x){
-
-  if(is.character(x)){
-    x <- getInputs(parse(text = x))
-    x <- x@functions
-    x <- names(x)
-    x
+melda.findFunctionName <- function(chr){
+  tryCatch({
+  if(is.character(chr)){
+      chr <- getInputs(parse(text = chr))
+      chr <- chr@functions
+      chr <- names(chr)
+      return(chr)
   }else{
     "It's not an expression"
   }
+  },error = function(e){
+    print(e)
+  })
 }
 
 

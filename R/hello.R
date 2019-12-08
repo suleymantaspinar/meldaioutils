@@ -25,6 +25,7 @@ melda.findDependency <- function(x){
 
 
 
+
 #' Load a melda.io json
 #'
 #This function takes melda.io json file. It gives R code blocks of melda.io json file as output
@@ -172,6 +173,66 @@ melda.findFunctionName <- function(chr){
 rem_dup.one <- function(x){
 
   paste(unique(trimws(unlist(strsplit(x,split="(?!')[ [:punct:]]",fixed=F,perl=T)))),collapse = " ")
+
+}
+
+
+#' Load a melda.io json
+#'
+#'This function parse the given character vector, searches for "library" keyword in it.
+#'
+#' @param expr is chr vector.
+#' @return returns R code blocks of melda.io json file as a data frame
+#' @export
+getLibraries <- function(expr,paranthesis = FALSE){
+
+  if(!is.null(expr) && length(expr) != 0){ #debugging
+    chr <- strsplit(expr, "\n" )[[1]]
+    temp <- ""
+    if( length(chr) == 1 && grepl("library\\(",chr)){ #checking for
+
+      print("Library founded")
+
+      temp <- paste(temp,chr,sep="")
+      temp <- gsub("\n", "",temp)
+      if( paranthesis == TRUE){
+        y <- regexpr( "\\(.*?\\)" , temp , perl = TRUE)
+
+        div <- regmatches( temp,y )
+
+        return(div)
+
+      }
+
+      return( temp )
+
+    }else if( length(chr) > 1){
+
+      for(a in 1:length(chr)){
+
+        if( grepl("library",chr[[a]] )){
+
+          print("Library founded")
+
+          temp <- paste(temp,chr[[a]],sep="","\n")
+
+          temp <- gsub("\n", "",temp)
+
+          # return( temp )
+        }
+      }
+      return( temp )
+
+    }else{
+      print("Library not found")
+      return(NULL)
+
+    }
+  }else{
+    print("Library not found")
+    return(NULL)
+
+  }
 
 }
 

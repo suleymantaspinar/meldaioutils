@@ -78,65 +78,62 @@ melda.read_object <- function(meldaJson){
 #' @param input function name as a string
 #' @return loads the functions' library if it is not loaded.
 #' @export
+melda.findLibrary <- function(expr){
 
-melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
+  if(!is.null(expr) && length(expr) != 0){ #debugging
+    chr <- strsplit(expr, "\n" )[[1]]
+    temp <- ""
+    print(length(chr))
+    if( (length(chr) == 1 && grepl("library\\(",chr)) || grepl("require\\(",chr)|| grepl("devtools",chr) || grepl("install.packages\\(",chr)){ #checking for
 
-    tryCatch(
-      {
+      print("Library founded")
 
-        df <- help.search(input)
+      y <- regexpr( "\\(.*?\\)" , chr , perl = TRUE)
 
-        df <- df$matches
+      div <- regmatches( chr,y )
 
-        x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
-      },error = function(e){
+      return(div)
 
-      }
-    )
-      if(length(x) > 1){
+    }else if( length(chr) > 1){
 
-      if(load == TRUE){
-        cat(  paste("1. is",x[[1]],"\n","2. is",x[[2]],"\n"), sep = "")
+      for(a in 1:length(chr)){
 
-        userInput <- as.numeric( readline(prompt =("Type 1 or 2:  ")))
+        if( grepl("library\\(",chr[[a]]) || grepl("require\\(",chr[[a]]) || grepl("devtools",chr[[a]]) ||  grepl("install.packages\\(",chr[[a]])){
+          print("Library founded")
 
-        print( paste( x[[userInput]],"is choosed","\n",x[[userInput]], "is attaching/loading"), sep= "")
+          y <- regexpr( "\\(.*?\\)" , chr[[a]] , perl = TRUE)
 
-        userLibrary <- as.character(paste(x[[userInput]]) , sep = "")
+          div <- regmatches( chr[[a]],y )
+
+          temp <- paste(temp,div,sep = " \n ")
+
+          temp <- sub("\n"," ",temp)
 
 
-      }
-      if(dblcolon == T ){
 
-        for(i in 1:length(x)){
-          x[[i]] <- paste(x[[i]],"::",input,sep ="")
         }
-        return(x)
-      }
-      return(x)
-    }else if(length(x) == 1){
 
-      if(load  == TRUE){
-        print( paste(x[[1]], "is loading"), sep= "")
-
-        userLibrary <- x[[1]]
 
       }
 
-      if(dblcolon == T ){
-        print(paste(x,"::",input,sep =""))
-      }
-      return(x)
+      temp <- rem_dup.one(temp)
+      temp <- gsub('"',"",temp)
+      temp <- strsplit(temp," ")[[1]]
+      return( temp[-1] )
+
     }else{
-      print("Function not found.")
+      print("Library not found")
       return(NULL)
-      }
 
+    }
+  }else{
+    print("Library not found")
+    return(NULL)
 
-
-
+  }
 
 }
+
 
 
 #' Load a Character Vector

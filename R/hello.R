@@ -75,10 +75,10 @@ melda.read_object <- function(meldaJson){
 #'
 #This function takes function names as input.
 #'
-#' @param input function name as a string
+#' @param expr is R expression   in chr
 #' @return loads the functions' library if it is not loaded.
 #' @export
-melda.findLibrary <- function(expr){
+melda.searchLibrary <- function(expr){
 
   if(!is.null(expr) && length(expr) != 0){ #debugging
     chr <- strsplit(expr, "\n" )[[1]]
@@ -173,6 +173,72 @@ rem_dup.one <- function(x){
 
 }
 
+
+#' Load a Matrix
+#'
+#This function takes function names as input.
+#'
+#' @param input function name as a string
+#' @return loads the functions' library if it is not loaded.
+#' @export
+melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
+
+  tryCatch(
+    {
+
+      df <- help.search(input)
+
+      df <- df$matches
+
+      x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
+    },error = function(e){
+
+    }
+  )
+  if(length(x) > 1){
+
+    if(load == TRUE){
+      cat(  paste("1. is",x[[1]],"\n","2. is",x[[2]],"\n"), sep = "")
+
+      userInput <- as.numeric( readline(prompt =("Type 1 or 2:  ")))
+
+      print( paste( x[[userInput]],"is choosed","\n",x[[userInput]], "is attaching/loading"), sep= "")
+
+      userLibrary <- as.character(paste(x[[userInput]]) , sep = "")
+
+
+    }
+    if(dblcolon == T ){
+
+      for(i in 1:length(x)){
+        x[[i]] <- paste(x[[i]],"::",input,sep ="")
+      }
+      return(x)
+    }
+    return(x)
+  }else if(length(x) == 1){
+
+    if(load  == TRUE){
+      print( paste(x[[1]], "is loading"), sep= "")
+
+      userLibrary <- x[[1]]
+
+    }
+
+    if(dblcolon == T ){
+      print(paste(x,"::",input,sep =""))
+    }
+    return(x)
+  }else{
+    print("Function not found.")
+    return(NULL)
+  }
+
+
+
+
+
+}
 
 
 

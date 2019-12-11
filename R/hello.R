@@ -92,6 +92,8 @@ melda.searchLibrary <- function(expr){
 
       div <- regmatches( chr,y )
 
+      div <- rem_dup.one(div)
+      div <- gsub("'","",div)
       return(div)
 
     }else if( length(chr) > 1){
@@ -145,14 +147,14 @@ melda.searchLibrary <- function(expr){
 #' @export
 melda.findFunctionName <- function(chr){
   tryCatch({
-  if(is.character(chr)){
+    if(is.character(chr)){
       chr <- getInputs(parse(text = chr))
       chr <- chr@functions
       chr <- names(chr)
       return(chr)
-  }else{
-    "It's not an expression"
-  }
+    }else{
+      "It's not an expression"
+    }
   },error = function(e){
     print(e)
   })
@@ -166,7 +168,6 @@ melda.findFunctionName <- function(chr){
 #' @param x takes  character vector  as an input
 #' @return returns non-duplicated words
 #' @export
-
 rem_dup.one <- function(x){
 
   paste(unique(trimws(unlist(strsplit(x,split="(?!')[ [:punct:]]",fixed=F,perl=T)))),collapse = " ")
@@ -182,15 +183,18 @@ rem_dup.one <- function(x){
 #' @return loads the functions' library if it is not loaded.
 #' @export
 melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
-
   tryCatch(
     {
 
       df <- help.search(input)
 
       df <- df$matches
+      if(length(df$Topic) == 1){
 
-      x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
+        x <- df$Package
+      }else{
+        x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
+      }
     },error = function(e){
 
     }
@@ -200,7 +204,7 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
     if(load == TRUE){
       cat(  paste("1. is",x[[1]],"\n","2. is",x[[2]],"\n"), sep = "")
 
-      userInput <- as.numeric( readline(prompt =("Type 1 or 2:  ")))
+      userInput <- as.numeric( readline(prompt =("Type  1weor 2:  ")))
 
       print( paste( x[[userInput]],"is choosed","\n",x[[userInput]], "is attaching/loading"), sep= "")
 
@@ -226,7 +230,7 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
     }
 
     if(dblcolon == T ){
-      print(paste(x,"::",input,sep =""))
+      x <- paste(x,"::",input,sep ="")
     }
     return(x)
   }else{
@@ -239,6 +243,7 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
 
 
 }
+
 
 
 

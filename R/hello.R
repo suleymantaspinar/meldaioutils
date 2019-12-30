@@ -92,7 +92,7 @@ melda.searchLibrary <- function(expr){
 
       div <- regmatches( chr,y )
 
-      div <- rem_dup.one(div)
+
       div <- gsub("'","",div)
       return(div)
 
@@ -118,10 +118,13 @@ melda.searchLibrary <- function(expr){
 
       }
 
-      temp <- rem_dup.one(temp)
+      temp <- strsplit(temp," ")[[1]]
+      temp <- unique(temp)
+      temp <- paste(collapse = " ")
       temp <- gsub('"',"",temp)
       temp <- strsplit(temp," ")[[1]]
       return( temp[-1] )
+
 
     }else{
       print("Library not found")

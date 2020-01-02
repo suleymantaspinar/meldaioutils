@@ -252,3 +252,34 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
 
 
 
+
+
+
+
+
+#' Load a Character Vector
+#'
+#This function takes function names as input.
+#'
+#' @param x takes  character vector  as an input
+#' @return returns function names as list
+#' @export
+melda.findVariableName <- function(chr){
+  tryCatch({
+    if(is.character(chr)){
+      chr <- getInputs(parse(text = gsub("\n"," \n",chr)))
+      chr <- chr@outputs
+      # chr <- names(chr)
+      return(chr)
+    }else{
+      "It's not an expression"
+    }
+  },error = function(e){
+    print(e)
+  })
+}
+
+
+
+
+

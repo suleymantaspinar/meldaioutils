@@ -142,7 +142,7 @@ melda.findFunctionName <- function(chr){
 melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
   tryCatch(
     {
-      input <- gsub("[[:punct:]]","\\",input )
+      input <- gsub("[[:punct:]]","\\\\",input )
 
       df <- help.search(input)
       df <- df$matches

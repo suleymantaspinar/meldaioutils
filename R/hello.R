@@ -36,44 +36,30 @@ melda.findDependency <- function(x){
 melda.read_object <- function(meldaJson){
 
   json <- jsonlite::fromJSON(meldaJson,simplifyDataFrame = FALSE)
-
   temp <- vector(mode = "list",  length = length(json$project$stages))
-
   print("Json file is read")
   tryCatch({
-
-    for(i in 1:length(json$project$stages)){ #looping for stages // i is the stage number
-      print( paste( "Stage number is:", i))
+    for(i in 1:length(json$project$stages)){ #looping for stages // i is the stage number      # print( paste( "Stage number is:", i))
       z <- 1
-      for(j in 1:length(json$project$stages[[i]][[8]])){ # for each R code cell in ith stage // j is the cell number
-        print( paste( "Stage number is:", i, "cell number is ", j))
-
+      for(j in 1:length(json$project$stages[[i]][[8]])){ # for each R code cell in ith stage // j is the cell number # print( paste( "Stage number is:", i, "cell number is ", j))
         if(json$project$stages[[i]][[8]][[j]]$language == "R"){
-
           temp[[i]][[z]] <-  json$project$stages[[i]][[8]][[j]]$code
-
-
-          temp[[i]][[z]] <- as.list(temp[[i]][[z]])
-          print( paste( "Stage number is:", i, "cell number is ", j))
+          temp[[i]][[z]] <- as.list(temp[[i]][[z]]) # print( paste( "Stage number is:", i, "cell number is ", j))
           z <- z + 1
         }
-
       }
     }
-
   },error = function(e) {
-    print(paste("Error in stage number:", i,"and cell number:" , j,e ))
+    # print(paste("Error in stage number:", i,"and cell number:" , j,e ))
   })
-
   return(temp)
-
 }
 
 
 
 #' Load a Matrix
 #'
-#This function takes function names as input.
+#This function takes expression as input.
 #'
 #' @param expr is R expression   in chr
 #' @return loads the functions' library if it is not loaded.
@@ -85,13 +71,9 @@ melda.searchLibrary <- function(expr){
     temp <- ""
     print(length(chr))
     if( (length(chr) == 1 && grepl("library\\(",chr)) || grepl("require\\(",chr)|| grepl("devtools",chr) || grepl("install.packages\\(",chr)){ #checking for
-
       print("Library founded")
-
       y <- regexpr( "\\(.*?\\)" , chr , perl = TRUE)
-
       div <- regmatches( chr,y )
-
       div <- rem_dup.one(div)
       div <- gsub("'","",div)
       return(div)
@@ -102,20 +84,11 @@ melda.searchLibrary <- function(expr){
 
         if( grepl("library\\(",chr[[a]]) || grepl("require\\(",chr[[a]]) || grepl("devtools",chr[[a]]) ||  grepl("install.packages\\(",chr[[a]])){
           print("Library founded")
-
           y <- regexpr( "\\(.*?\\)" , chr[[a]] , perl = TRUE)
-
           div <- regmatches( chr[[a]],y )
-
           temp <- paste(temp,div,sep = " \n ")
-
           temp <- sub("\n"," ",temp)
-
-
-
         }
-
-
       }
 
       temp <- rem_dup.one(temp)
@@ -124,19 +97,17 @@ melda.searchLibrary <- function(expr){
       return( temp[-1] )
 
     }else{
+
       print("Library not found")
       return(NULL)
-
     }
   }else{
+
     print("Library not found")
     return(NULL)
-
   }
 
 }
-
-
 
 #' Load a Character Vector
 #'
@@ -158,21 +129,6 @@ melda.findFunctionName <- function(chr){
   },error = function(e){
     print(e)
   })
-}
-
-
-#' Remove duplicate words
-#'
-#This function takes character vector and removes
-#'the duplicate words.
-#' @param x takes  character vector  as an input
-#' @return returns non-duplicated words
-#' @export
-
-rem_dup.one <- function(x){
-
-  paste(unique(trimws(unlist(strsplit(x,split="(?!')[ [:punct:]]",fixed=F,perl=T)))),collapse = " ")
-
 }
 
 
@@ -245,10 +201,10 @@ melda.findLibraryInDefPkgs <- function(funcName){
   defaultLibs <- sessionInfo()
   defaultLibs <- c(defaultLibs$basePkgs,names(defaultLibs$otherPkgs))
   libName <- melda.findLibrary( funcName )
-  if(!is.null(libName) && length(libName) == 1){
+  if( !is.null(libName) && length(libName) == 1){
     libName <- libName
     funcName <- paste(defaultLibs[[ind]], "::", funcName,sep = "")
-  }else if(!is.null(libName) && length(libName) > 1){
+  }else if( !is.null(libName) && length(libName) > 1){
     for( m in 1:length(libName)){
       tryCatch({
         if( grep( libName[[m]],defaultLibs) != 0){
@@ -262,11 +218,7 @@ melda.findLibraryInDefPkgs <- function(funcName){
       },error = function(e){print(paste("Function is not found in default libraries"))})
     }
   }
-  return(libName)
-
+  return(data.frame(libName = as.character(libName),
+                    funcName =as.character(funcName),stringsAsFactors = F))
 }
-
-
-
-
 

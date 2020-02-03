@@ -140,17 +140,15 @@ melda.findFunctionName <- function(chr){
 #' @return loads the functions' library if it is not loaded.
 #' @export
 melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
-
   tryCatch(
     {
+      input <- gsub("[[:punct:]]","\\",input )
 
       df <- help.search(input)
-
       df <- df$matches
-
       x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
     },error = function(e){
-
+      return(NULL)
     }
   )
   if(length(x) > 1){

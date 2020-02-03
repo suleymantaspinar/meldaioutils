@@ -92,7 +92,7 @@ melda.searchLibrary <- function(expr){
 
       div <- regmatches( chr,y )
 
-
+      div <- rem_dup.one(div)
       div <- gsub("'","",div)
       return(div)
 
@@ -118,13 +118,10 @@ melda.searchLibrary <- function(expr){
 
       }
 
-      temp <- strsplit(temp," ")[[1]]
-      temp <- unique(temp)
-      temp <- paste(collapse = " ")
+      temp <- rem_dup.one(temp)
       temp <- gsub('"',"",temp)
       temp <- strsplit(temp," ")[[1]]
       return( temp[-1] )
-
 
     }else{
       print("Library not found")
@@ -150,14 +147,14 @@ melda.searchLibrary <- function(expr){
 #' @export
 melda.findFunctionName <- function(chr){
   tryCatch({
-    if(is.character(chr)){
+  if(is.character(chr)){
       chr <- getInputs(parse(text = chr))
       chr <- chr@functions
       chr <- names(chr)
       return(chr)
-    }else{
-      "It's not an expression"
-    }
+  }else{
+    "It's not an expression"
+  }
   },error = function(e){
     print(e)
   })
@@ -171,6 +168,7 @@ melda.findFunctionName <- function(chr){
 #' @param x takes  character vector  as an input
 #' @return returns non-duplicated words
 #' @export
+
 rem_dup.one <- function(x){
 
   paste(unique(trimws(unlist(strsplit(x,split="(?!')[ [:punct:]]",fixed=F,perl=T)))),collapse = " ")
@@ -186,34 +184,25 @@ rem_dup.one <- function(x){
 #' @return loads the functions' library if it is not loaded.
 #' @export
 melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
+
   tryCatch(
     {
 
       df <- help.search(input)
 
       df <- df$matches
-      if(length(df$Topic) == 1){
 
-        x <- df$Package
-      }else{
-        x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
-      }
+      x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
     },error = function(e){
 
     }
   )
   if(length(x) > 1){
-
     if(load == TRUE){
       cat(  paste("1. is",x[[1]],"\n","2. is",x[[2]],"\n"), sep = "")
-
-      userInput <- as.numeric( readline(prompt =("Type  1weor 2:  ")))
-
+      userInput <- as.numeric( readline(prompt =("Type 1 or 2:  ")))
       print( paste( x[[userInput]],"is choosed","\n",x[[userInput]], "is attaching/loading"), sep= "")
-
       userLibrary <- as.character(paste(x[[userInput]]) , sep = "")
-
-
     }
     if(dblcolon == T ){
 
@@ -233,50 +222,48 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
     }
 
     if(dblcolon == T ){
-      x <- paste(x,"::",input,sep ="")
+      print(paste(x,"::",input,sep =""))
     }
     return(x)
   }else{
     print("Function not found.")
     return(NULL)
   }
-
-
-
-
-
 }
 
 
 
 
-
-
-
-
-
-
-
-#' Load a Character Vector
+#' Load a Matrix
 #'
 #This function takes function names as input.
 #'
-#' @param x takes  character vector  as an input
-#' @return returns function names as list
+#' @param funcName function name as a string
+#' @return loads the functions' library if it is not loaded.
 #' @export
-melda.findVariableName <- function(chr){
-  tryCatch({
-    if(is.character(chr)){
-      chr <- getInputs(parse(text = gsub("\n"," \n",chr)))
-      chr <- chr@outputs
-      # chr <- names(chr)
-      return(chr)
-    }else{
-      "It's not an expression"
+melda.findLibraryInDefPkgs <- function(funcName){
+  defaultLibs <- sessionInfo()
+  defaultLibs <- c(defaultLibs$basePkgs,names(defaultLibs$otherPkgs))
+  libName <- melda.findLibrary( funcName )
+  if(!is.null(libName) && length(libName) == 1){
+    libName <- libName
+    funcName <- paste(defaultLibs[[ind]], "::", funcName,sep = "")
+  }else if(!is.null(libName) && length(libName) > 1){
+    for( m in 1:length(libName)){
+      tryCatch({
+        if( grep( libName[[m]],defaultLibs) != 0){
+          ind <- grep(libName[[m]],defaultLibs)
+          libName <- defaultLibs[[ind]]
+          funcName <- paste(defaultLibs[[ind]], "::",funcName,sep = "")
+          break()
+        }else{
+          libname <- NULL
+        }
+      },error = function(e){print(paste("Function is not found in default libraries"))})
     }
-  },error = function(e){
-    print(e)
-  })
+  }
+  return(libName)
+
 }
 
 

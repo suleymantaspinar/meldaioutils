@@ -142,7 +142,7 @@ melda.findFunctionName <- function(chr){
 melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
   tryCatch(
     {
-      input <- gsub("[[:punct:]]","\\\\",input )
+      input <- gsub("([+.])","\\\\\\1", input ) #escaping special characters
 
       df <- help.search(input)
       df <- df$matches
@@ -222,4 +222,5 @@ melda.findLibraryInDefPkgs <- function(funcName){
 }
 
 
+gsub("\\Q.\\E","HEYy"," [")
 

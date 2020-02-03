@@ -218,10 +218,12 @@ melda.findLibraryInDefPkgs <- function(funcName){
       },error = function(e){print(paste("Function is not found in default libraries"))})
     }
   }else{
-    libName <- NULL
+    libName <- "-"
     funcName <- funcName
   }
   return(data.frame(libName = as.character(libName),
                     funcName =as.character(funcName),stringsAsFactors = F))
 }
+
+
 

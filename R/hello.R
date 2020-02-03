@@ -170,9 +170,7 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
 
     if(load  == TRUE){
       print( paste(x[[1]], "is loading"), sep= "")
-
       userLibrary <- x[[1]]
-
     }
 
     if(dblcolon == T ){

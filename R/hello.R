@@ -56,6 +56,11 @@ melda.read_object <- function(meldaJson){
 }
 
 
+rem_dup.one <- function(x){
+
+  paste(unique(trimws(unlist(strsplit(x,split="(?!')[ [:punct:]]",fixed=F,perl=T)))),collapse = " ")
+
+}
 
 #' Load a Matrix
 #'
@@ -140,7 +145,7 @@ melda.findFunctionName <- function(chr){
 melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
   tryCatch(
     {
-      input <-gsub("\\[","\\\\[",input)
+      # input <-gsub("\\[","\\\\[",input)
       df <- help.search(input)
       df <- df$matches
       x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
@@ -218,6 +223,4 @@ melda.findLibraryInDefPkgs <- function(funcName){
                     funcName =as.character(funcName),stringsAsFactors = F))
 }
 
-
-gsub("\\Q.\\E","HEYy"," [")
 

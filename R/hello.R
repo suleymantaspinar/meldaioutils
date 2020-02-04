@@ -146,9 +146,14 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
   tryCatch(
     {
       input <-gsub("\\[","\\\\[",input)
-      df <- help.search(input)
+      df <- help.search( input)
       df <- df$matches
-      x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
+      if(!is.null(df)){
+        return(NULL)
+      }else{
+        x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
+      }
+
     },error = function(e){
       return(NULL)
     }
@@ -172,7 +177,9 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
 
     if(load  == TRUE){
       print( paste(x[[1]], "is loading"), sep= "")
+
       userLibrary <- x[[1]]
+
     }
 
     if(dblcolon == T ){

@@ -201,26 +201,33 @@ melda.findLibraryInDefPkgs <- function(funcName){
   libName <- melda.findLibrary( funcName )
   if( !is.null(libName) && length(libName) == 1){
     libName <- libName
-    funcName <- paste(defaultLibs[[ind]], "::", funcName,sep = "")
+    funcName <- paste(libName, "::", funcName,sep = "")
   }else if( !is.null(libName) && length(libName) > 1){
     for( m in 1:length(libName)){
       tryCatch({
-        if( grep( libName[[m]],defaultLibs) != 0){
+        if(length(grep( libName[[m]],defaultLibs)) == 0) {
+          libName[[m]] <- NA
+        }else{
           ind <- grep(libName[[m]],defaultLibs)
           libName <- defaultLibs[[ind]]
           funcName <- paste(defaultLibs[[ind]], "::",funcName,sep = "")
           break()
-        }else{
-          libname <- NULL
         }
-      },error = function(e){print(paste("Function is not found in default libraries"))})
+      },error = function(e){
+      })
     }
+    libName <- libName[!unlist(lapply(libName, is.na))]
+
   }else{
     libName <- "-"
     funcName <- funcName
   }
+  if(length(libName) == 0){
+    libName <- "-"
+  }
   return(data.frame(libName = as.character(libName),
-                    funcName =as.character(funcName),stringsAsFactors = F))
+                    funcName =as.character(funcName),
+                    stringsAsFactors = F))
 }
 
 

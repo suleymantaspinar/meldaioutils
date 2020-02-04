@@ -37,7 +37,7 @@ melda.read_object <- function(meldaJson){
 
   json <- jsonlite::fromJSON(meldaJson,simplifyDataFrame = FALSE)
   temp <- vector(mode = "list",  length = length(json$project$stages))
-  print("Json file is read")
+  # print("Json file is read")
   tryCatch({
     for(i in 1:length(json$project$stages)){ #looping for stages // i is the stage number      # print( paste( "Stage number is:", i))
       z <- 1
@@ -74,9 +74,9 @@ melda.searchLibrary <- function(expr){
   if(!is.null(expr) && length(expr) != 0){ #debugging
     chr <- strsplit(expr, "\n" )[[1]]
     temp <- ""
-    print(length(chr))
+    # print(length(chr))
     if( (length(chr) == 1 && grepl("library\\(",chr)) || grepl("require\\(",chr)|| grepl("devtools",chr) || grepl("install.packages\\(",chr)){ #checking for
-      print("Library founded")
+      # print("Library founded")
       y <- regexpr( "\\(.*?\\)" , chr , perl = TRUE)
       div <- regmatches( chr,y )
       div <- rem_dup.one(div)
@@ -88,7 +88,7 @@ melda.searchLibrary <- function(expr){
       for(a in 1:length(chr)){
 
         if( grepl("library\\(",chr[[a]]) || grepl("require\\(",chr[[a]]) || grepl("devtools",chr[[a]]) ||  grepl("install.packages\\(",chr[[a]])){
-          print("Library founded")
+          # print("Library founded")
           y <- regexpr( "\\(.*?\\)" , chr[[a]] , perl = TRUE)
           div <- regmatches( chr[[a]],y )
           temp <- paste(temp,div,sep = " \n ")
@@ -103,12 +103,12 @@ melda.searchLibrary <- function(expr){
 
     }else{
 
-      print("Library not found")
+      # print("Library not found")
       return(NULL)
     }
   }else{
 
-    print("Library not found")
+    # print("Library not found")
     return(NULL)
   }
 
@@ -122,18 +122,15 @@ melda.searchLibrary <- function(expr){
 #' @return returns function names as list
 #' @export
 melda.findFunctionName <- function(chr){
-  tryCatch({
-  if(is.character(chr)){
-      chr <- getInputs(parse(text = chr))
-      chr <- chr@functions
-      chr <- names(chr)
-      return(chr)
+  chr <- getInputs(parse(text = chr))
+  if(length(chr@functions) == 0){
+    return(NULL)
   }else{
-    "It's not an expression"
+    chr <- chr@functions
+    chr <- names(chr)
+    return(chr)
   }
-  },error = function(e){
-    print(e)
-  })
+
 }
 #' Load a Matrix
 #'
@@ -162,7 +159,7 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
     if(load == TRUE){
       cat(  paste("1. is",x[[1]],"\n","2. is",x[[2]],"\n"), sep = "")
       userInput <- as.numeric( readline(prompt =("Type 1 or 2:  ")))
-      print( paste( x[[userInput]],"is choosed","\n",x[[userInput]], "is attaching/loading"), sep= "")
+      # print( paste( x[[userInput]],"is choosed","\n",x[[userInput]], "is attaching/loading"), sep= "")
       userLibrary <- as.character(paste(x[[userInput]]) , sep = "")
     }
     if(dblcolon == T ){
@@ -176,18 +173,18 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
   }else if(length(x) == 1){
 
     if(load  == TRUE){
-      print( paste(x[[1]], "is loading"), sep= "")
+      # print( paste(x[[1]], "is loading"), sep= "")
 
       userLibrary <- x[[1]]
 
     }
 
     if(dblcolon == T ){
-      print(paste(x,"::",input,sep =""))
+      # print(paste(x,"::",input,sep =""))
     }
     return(x)
   }else{
-    print("Function not found.")
+    # print("Function not found.")
     return(NULL)
   }
 }

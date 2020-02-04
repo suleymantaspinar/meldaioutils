@@ -1,4 +1,4 @@
-Package: Melda.utils
+Package: meldaioutils
 Type: Package
 Title: Melda.io Code Analysis Package (Title Case)
 Version: 0.1.0

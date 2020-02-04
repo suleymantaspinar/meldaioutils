@@ -130,7 +130,6 @@ melda.findFunctionName <- function(chr){
     chr <- names(chr)
     return(chr)
   }
-
 }
 #' Load a Matrix
 #'

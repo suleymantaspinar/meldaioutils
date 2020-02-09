@@ -23,9 +23,6 @@ melda.findDependency <- function(x){
 
 }
 
-
-
-
 #' Load a melda.io json
 #'
 #This function takes melda.io json file. It gives R code blocks of melda.io json file as output
@@ -34,7 +31,6 @@ melda.findDependency <- function(x){
 #' @return returns R code blocks of melda.io json file as a data frame
 #' @export
 melda.read_object <- function(meldaJson){
-
   json <- jsonlite::fromJSON(meldaJson,simplifyDataFrame = FALSE)
   temp <- vector(mode = "list",  length = length(json$project$stages))
   # print("Json file is read")
@@ -57,9 +53,7 @@ melda.read_object <- function(meldaJson){
 
 
 rem_dup.one <- function(x){
-
   paste(unique(trimws(unlist(strsplit(x,split="(?!')[ [:punct:]]",fixed=F,perl=T)))),collapse = " ")
-
 }
 
 #' Load a Matrix
@@ -70,7 +64,6 @@ rem_dup.one <- function(x){
 #' @return loads the functions' library if it is not loaded.
 #' @export
 melda.searchLibrary <- function(expr){
-
   if(!is.null(expr) && length(expr) != 0){ #debugging
     chr <- strsplit(expr, "\n" )[[1]]
     temp <- ""
@@ -95,23 +88,16 @@ melda.searchLibrary <- function(expr){
           temp <- sub("\n"," ",temp)
         }
       }
-
       temp <- rem_dup.one(temp)
       temp <- gsub('"',"",temp)
       temp <- strsplit(temp," ")[[1]]
       return( temp[-1] )
-
     }else{
-
-      # print("Library not found")
       return(NULL)
     }
   }else{
-
-    # print("Library not found")
     return(NULL)
   }
-
 }
 
 #' Load a Character Vector
@@ -131,6 +117,7 @@ melda.findFunctionName <- function(chr){
     return(chr)
   }
 }
+
 #' Load a Matrix
 #'
 #This function takes function names as input.
@@ -144,13 +131,8 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
       input <-gsub("\\[","\\\\[",input)
       df <- help.search( input)
       df <- df$matches
-      if(!is.null(df)){
-        return(NULL)
-      }else{
-        x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
-      }
-
-    },error = function(e){
+      x  <- strsplit(rem_dup.one(paste(df[df$Topic == input,5],collapse = " ")) , " ")[[1]]
+      },error = function(e){
       return(NULL)
     }
   )
@@ -162,7 +144,6 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
       userLibrary <- as.character(paste(x[[userInput]]) , sep = "")
     }
     if(dblcolon == T ){
-
       for(i in 1:length(x)){
         x[[i]] <- paste(x[[i]],"::",input,sep ="")
       }
@@ -172,14 +153,9 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
   }else if(length(x) == 1){
 
     if(load  == TRUE){
-      # print( paste(x[[1]], "is loading"), sep= "")
-
       userLibrary <- x[[1]]
-
     }
-
     if(dblcolon == T ){
-      # print(paste(x,"::",input,sep =""))
     }
     return(x)
   }else{
@@ -187,8 +163,6 @@ melda.findLibrary <- function(input,load = FALSE, dblcolon = FALSE){
     return(NULL)
   }
 }
-
-
 
 
 #' Load a Matrix
@@ -234,3 +208,55 @@ melda.findLibraryInDefPkgs <- function(funcName){
 }
 
 
+
+
+#' Load an R expression
+#'
+#This function takes R expresions as input.
+#'
+#' @param expr is a R expression
+#' @return detailed benchmark results..
+#' @export
+melda.benchmark <-function(expr){
+  tryCatch({
+    b <- bench::mark( { parse(text = expr)})
+    return(b[c("min","median","itr/sec","mem_alloc")])
+  },error = function(e){
+    return(NULL)
+  })
+
+}
+
+
+#' Load an R expression
+#'
+#This function takes R expresions as input.
+#'
+#' @param expr is a R expression
+#' @return loads the functions' library if it is not loaded.
+#' @export
+melda.findDataFiles <- function(expr){
+  if(!is.null(expr) && length(expr) != 0){ #debugging
+    chr <- strsplit(expr, "\n" )[[1]]
+    temp <- ""
+    for(a in 1:length(chr)){
+      if(  grepl("read.*\\(",chr) || grepl( "read\\_",chr) ){
+        y <- regexpr( "\\(.*?\\)" , chr[[a]] , perl = TRUE)
+        div <- regmatches( chr[[a]],y )
+        if( grepl("\\,",div)){
+          y <- regexpr( "\\(.*?\\," , chr[[a]] , perl = TRUE)
+          div <- regmatches( chr[[a]],y )
+        }
+        temp <- paste(temp,div,sep = " \n ")
+        temp <- sub("\n"," ",temp)
+      }
+    }
+    temp <- rem_dup.one(temp)
+    temp <- gsub('"',"",temp)
+    temp <- strsplit(temp," ")[[1]]
+    print( temp[-1] )
+
+  }else{
+    print(NULL)
+  }
+}

@@ -220,7 +220,7 @@ melda.findLibraryInDefPkgs <- function(funcName){
 melda.benchmark <-function(expr){
   tryCatch({
     b <- bench::mark( { parse(text = expr)})
-    return(b[c("min","median","itr/sec","mem_alloc")])
+    return(b[c("min","median","itr/sec","n_gc")])
   },error = function(e){
     return(NULL)
   })
@@ -246,12 +246,15 @@ melda.findDataFiles <- function(expr){
         if( grepl("\\,",div)){
           y <- regexpr( "\\(.*?\\," , chr[[a]] , perl = TRUE)
           div <- regmatches( chr[[a]],y )
+          div <- sub("\\(","",div)
+          div <- sub("\\,","",div)
         }
-        temp <- paste(temp,div,sep = " \n ")
+        div <- sub("\\(","",div)
+        div <- sub("\\)","",div)
+        temp <- paste(temp,div,sep ="\n")
         temp <- sub("\n"," ",temp)
       }
     }
-    temp <- rem_dup.one(temp)
     temp <- gsub('"',"",temp)
     temp <- strsplit(temp," ")[[1]]
     print( temp[-1] )
@@ -259,4 +262,5 @@ melda.findDataFiles <- function(expr){
   }else{
     print(NULL)
   }
+
 }

@@ -264,3 +264,33 @@ melda.findDataFiles <- function(expr){
   }
 
 }
+
+
+#' Load an R expression
+#'
+#This function takes R expresions as input.
+#'
+#' @param expr is a R expression
+#' @return loaded functions.
+#' @export
+melda.findDependencies <- function(input){
+  defaultLibs <- sessionInfo()
+  defaultLibs <- c(defaultLibs$basePkgs,names(defaultLibs$otherPkgs))
+  funcNames <- melda.findFunctionName( input )
+  cellType <- "R"
+  allDeps <- list()
+  for(func in funcNames){
+    libName <- melda.findLibraryInDefPkgs(func)$libName
+    funcName <- melda.findLibraryInDefPkgs(func)$funcName
+    allDeps <- append(allDeps,list(list(funcName  = funcName ,
+                                        libName = libName,
+                                        cellType = cellType
+    )))
+  }
+  if(length(allDeps) == 0 ){
+    return(list())
+  }else{
+    #toJSON(allDeps,auto_unbox = T,pretty = T)
+    toJSON(allDeps)
+  }
+}

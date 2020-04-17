@@ -8,5 +8,4 @@ Description: Melda.io Code Analysis Package
 License:GPL 3
 Encoding: UTF-8
 LazyData: true
-Imports:
-    CodeDepends::getInputs()
+Imports: CodeDepends

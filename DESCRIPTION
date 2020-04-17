@@ -1,20 +1,12 @@
 Package: meldaioutils
 Type: Package
-Title: Melda.io Code Analysis Package (Title Case)
+Title: Melda.io Code Analysis Package
 Version: 0.1.0
-Author: PranaGEO
-Maintainer: The package maintainer: <pranageo@pranageo.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: Licenced by SuleyTheGreat?
+Author: Suleyman Taspinar
+Maintainer: The package maintainer: <suleyman@pranageo.com>
+Description: Melda.io Code Analysis Package
+License:GPL 3
 Encoding: UTF-8
 LazyData: true
 Imports:
-    jsonlite,
-    CodeDepends,
-    tools
-Depends:
-    jsonlite,
-    CodeDepends,
-    tools
-
+    CodeDepends::getInputs()
